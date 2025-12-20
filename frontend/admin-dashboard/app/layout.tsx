@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useEffect } from 'react';
 import { ThemeProvider } from '../../shared-ui/Theme';
-import { isAuthenticated, hasRole } from from '@auth/auth';
+import { isAuthenticated, hasRole } from '@auth/auth';
 
 /**
  * AdminLayout
