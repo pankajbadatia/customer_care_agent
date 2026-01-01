@@ -20,3 +20,5 @@ env/
 .idea/
 .env
 node_modules
+./next/cache/
+./next
