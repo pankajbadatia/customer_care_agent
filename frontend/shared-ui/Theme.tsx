@@ -1,99 +1,74 @@
-'use client';
+"use client";
 
-import React, { ReactNode, createContext, useContext, useMemo, useState } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
-/**
- * Theme definitions
- */
-export type ThemeMode = 'light' | 'dark';
+import { themeTokens } from "./theme/tokens";
 
-export interface ThemeTokens {
-  background: string;
-  surface: string;
-  textPrimary: string;
-  textSecondary: string;
-  border: string;
-  accent: string;
-  success: string;
-  warning: string;
-  error: string;
-}
+export type ThemeMode = "light" | "dark";
 
-/**
- * Token sets (extendable)
- */
-const lightTheme: ThemeTokens = {
-  background: '#f8fafc',
-  surface: '#ffffff',
-  textPrimary: '#0f172a',
-  textSecondary: '#475569',
-  border: '#e2e8f0',
-  accent: '#2563eb',
-  success: '#16a34a',
-  warning: '#f59e0b',
-  error: '#dc2626',
-};
-
-const darkTheme: ThemeTokens = {
-  background: '#020617',
-  surface: '#020617',
-  textPrimary: '#f8fafc',
-  textSecondary: '#94a3b8',
-  border: '#1e293b',
-  accent: '#3b82f6',
-  success: '#22c55e',
-  warning: '#fbbf24',
-  error: '#ef4444',
-};
-
-/**
- * Context contract
- */
-interface ThemeContextValue {
+export interface ThemeContextValue {
   mode: ThemeMode;
-  tokens: ThemeTokens;
+  tokens: typeof themeTokens.light;
   toggleTheme: () => void;
   setTheme: (mode: ThemeMode) => void;
 }
 
-/**
- * Context
- */
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-/**
- * Provider
- */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('light');
+  const [mode, setMode] = useState<ThemeMode>("light");
 
-  const tokens = useMemo<ThemeTokens>(() => {
-    return mode === 'light' ? lightTheme : darkTheme;
+  // Load saved preference
+  useEffect(() => {
+    const saved = window.localStorage.getItem("csacp-theme");
+    if (saved === "light" || saved === "dark") {
+      setMode(saved);
+    }
+  }, []);
+
+  const tokens = useMemo(
+    () => (mode === "light" ? themeTokens.light : themeTokens.dark),
+    [mode]
+  );
+
+  const applyCssVars = () => {
+    const r = document.documentElement;
+
+    Object.entries(tokens).forEach(([k, v]) => {
+      r.style.setProperty(`--ui-${k}`, v as string);
+    });
+
+    // add body class
+    document.body.dataset.theme = mode;
+  };
+
+  useEffect(() => {
+    applyCssVars();
+    window.localStorage.setItem("csacp-theme", mode);
   }, [mode]);
-
-  const toggleTheme = () => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  const setTheme = (newMode: ThemeMode) => {
-    setMode(newMode);
-  };
 
   const value: ThemeContextValue = {
     mode,
     tokens,
-    toggleTheme,
-    setTheme,
+    toggleTheme: () => setMode((m) => (m === "light" ? "dark" : "light")),
+    setTheme: setMode,
   };
 
   return (
     <ThemeContext.Provider value={value}>
       <div
         style={{
-          backgroundColor: tokens.background,
+          minHeight: "100vh",
+          background: tokens.background,
           color: tokens.textPrimary,
-          minHeight: '100vh',
-          width: '100%',
+          fontFamily: "-apple-system,BlinkMacSystemFont,Inter,system-ui,sans-serif",
         }}
       >
         {children}
@@ -102,13 +77,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Hook for consumers
- */
-export function useTheme(): ThemeContextValue {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+export function useTheme() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme must be used inside ThemeProvider");
+  return ctx;
 }

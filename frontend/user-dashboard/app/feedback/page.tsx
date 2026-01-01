@@ -1,7 +1,11 @@
 'use client';
+import { UserShell } from "../user-shell";
 
 import React, { useState } from 'react';
-import Button from '../../shared-ui/Button';
+import Button from '../../../shared-ui/Button';
+
+// import Button from '@shared-ui/Button';
+
 import { submitFeedback } from './actions';
 import {
   FeedbackCategory,
@@ -55,6 +59,7 @@ export default function FeedbackPage() {
   }
 
   return (
+    <UserShell>
     <main
       style={{
         padding: '1.5rem',
@@ -180,5 +185,6 @@ export default function FeedbackPage() {
         </Button>
       </section>
     </main>
+    </UserShell>
   );
 }

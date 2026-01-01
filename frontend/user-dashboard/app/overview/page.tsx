@@ -1,53 +1,64 @@
-import SummaryCards from './components/SummaryCards';
-import SlaTrend from './components/SlaTrend';
-import TicketStatusChart from './components/TicketStatusChart';
-import OverviewActions from './components/OverviewActions';
+import { UserShell } from "../user-shell";
 
-import Table from '../../components/Tables';
-import { fetchOverviewData } from './actions';
-import type { TicketRow } from './types';
+import SummaryCards from "./components/SummaryCards";
+import SlaTrend from "./components/SlaTrend";
+import TicketStatusChart from "./components/TicketStatusChart";
+import OverviewActions from "./components/OverviewActions";
+
+import Table from "../../components/Tables";
+import { fetchOverviewData } from "./actions";
+import type { TicketRow } from "./types";
 
 /**
- * Overview Page (Server Component)
+ * Overview Page (Protected)
  *
- * Responsibilities:
- * - Fetch overview data (server-side)
- * - Compose page layout
- * - Delegate interactivity to client components
+ * Only renders inside UserShell.
+ * If user is not authenticated → redirected to /login
  */
 export default async function OverviewPage() {
   const data = await fetchOverviewData();
 
   return (
-    <main
-      style={{
-        padding: '1.5rem',
-        backgroundColor: '#f8fafc',
-        minHeight: '100vh',
-      }}
-    >
+    <UserShell>
       {/* Header */}
-      <header style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 600 }}>
+      <header
+        style={{
+          marginBottom: "1.25rem",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            margin: 0,
+          }}
+        >
           Overview
         </h1>
-        <p style={{ color: '#475569', marginTop: '0.25rem' }}>
-          Quick snapshot of your support activity and SLAs
+
+        <p
+          style={{
+            color: "#64748b",
+            marginTop: "0.25rem",
+            fontSize: "0.9rem",
+          }}
+        >
+          Snapshot of your support activity, SLAs, and ticket flow.
         </p>
       </header>
 
       {/* Summary cards */}
-      <section style={{ marginBottom: '1.5rem' }}>
+      <section style={{ marginBottom: "1.5rem" }}>
         <SummaryCards stats={data.summary} />
       </section>
 
       {/* Charts */}
       <section
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '1rem',
-          marginBottom: '1.5rem',
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "1rem",
+          marginBottom: "1.5rem",
         }}
       >
         <TicketStatusChart data={data.ticketStatus} />
@@ -55,31 +66,62 @@ export default async function OverviewPage() {
       </section>
 
       {/* Recent tickets */}
-      <section style={{ marginBottom: '1.5rem' }}>
-        <h2
+      <section
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.75rem",
+          backgroundColor: "#ffffff",
+          borderRadius: "0.9rem",
+          padding: "1rem 1.1rem",
+          boxShadow: "0 16px 35px rgba(15, 23, 42, 0.06)",
+          border: "1px solid #e2e8f0",
+        }}
+      >
+        <div
           style={{
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            marginBottom: '0.5rem',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            gap: "0.75rem",
           }}
         >
-          Recent Tickets
-        </h2>
+          <h2
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              margin: 0,
+            }}
+          >
+            Recent tickets
+          </h2>
+
+          <span
+            style={{
+              fontSize: "0.8rem",
+              color: "#94a3b8",
+            }}
+          >
+            Last 24 hours
+          </span>
+        </div>
 
         <Table<TicketRow>
           columns={[
-            { key: 'id', header: 'Ticket ID' },
-            { key: 'status', header: 'Status' },
-            { key: 'priority', header: 'Priority' },
-            { key: 'slaHrs', header: 'SLA (hrs)' },
+            { key: "id", header: "Ticket ID" },
+            { key: "status", header: "Status" },
+            { key: "priority", header: "Priority" },
+            { key: "slaHrs", header: "SLA (hrs)" },
           ]}
           data={data.recentTickets}
           emptyMessage="No recent tickets"
         />
       </section>
 
-      {/* Client-side actions (buttons) */}
-      <OverviewActions />
-    </main>
+      {/* Actions (CTA strip) */}
+      <div style={{ marginTop: "1.25rem" }}>
+        <OverviewActions />
+      </div>
+    </UserShell>
   );
 }

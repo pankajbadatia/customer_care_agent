@@ -1,21 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  /**
-   * Public runtime configuration
-   * (safe to expose to browser)
-   */
-  env: {
-    NEXT_PUBLIC_APP_NAME: 'Customer Support Portal',
-    NEXT_PUBLIC_API_BASE_URL:
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
+  
+  // 👈 Turbopack root (silences lockfile warning)
+  experimental: {
+    turbopack: {
+      root: __dirname
+    }
   },
 
-  /**
-   * Proxy API calls through Next.js
-   * Avoids CORS issues in browser
-   */
+  env: {
+    NEXT_PUBLIC_APP_NAME: 'Customer Support Portal',
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
+  },
+
   async rewrites() {
     return [
       {
@@ -26,14 +24,6 @@ const nextConfig = {
   },
 
   compress: true,
-
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 module.exports = nextConfig;

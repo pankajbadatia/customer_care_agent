@@ -1,31 +1,50 @@
 /* eslint-disable no-console */
 
-export type UserRole = 'user';
+/**
+ * =========================================================
+ * Auth types
+ * =========================================================
+ */
+
+export type UserRole = 'user' | 'admin';
 
 export interface AuthClaims {
-  sub?: string;          // user id
-  email?: string;
-  roles?: UserRole[];    // ["user"]
-  exp?: number;          // epoch seconds
-  iat?: number;
+  sub?: string;          // subject (email)
+  role?: UserRole;       // backend-issued role
+  exp?: number;          // expiry (epoch seconds)
+  iat?: number;          // issued at
   iss?: string;
   aud?: string | string[];
   [k: string]: unknown;
 }
 
-const ACCESS_TOKEN_COOKIE = 'csacp_user_access_token';
-
 /**
- * Environment safety
+ * =========================================================
+ * Constants
+ * =========================================================
  */
+
+const ACCESS_TOKEN_COOKIE = 'csacp_user_access_token';
+const API_BASE_URL = 'http://localhost:8010';
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || "http://localhost:8010";
+/**
+ * =========================================================
+ * Environment helpers
+ * =========================================================
+ */
+
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
 /**
- * Decode base64url JWT payload (NO signature verification)
- * Signature verification must happen on backend
+ * =========================================================
+ * JWT helpers (decode ONLY, never verify)
+ * =========================================================
  */
+
 function base64UrlDecode(input: string): string {
   const padded = input
     .replace(/-/g, '+')
@@ -36,7 +55,7 @@ function base64UrlDecode(input: string): string {
     return atob(padded);
   }
 
-  // Fallback for environments with Buffer
+  // Node / edge fallback
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const B: any = (globalThis as any).Buffer;
   if (B?.from) return B.from(padded, 'base64').toString('utf-8');
@@ -55,15 +74,18 @@ export function decodeJwt(token: string): AuthClaims | null {
   }
 }
 
-export function isExpired(claims: AuthClaims | null, skewSeconds = 30): boolean {
+function isExpired(claims: AuthClaims | null, skewSeconds = 30): boolean {
   if (!claims?.exp) return false;
   const now = Math.floor(Date.now() / 1000);
   return claims.exp <= now + skewSeconds;
 }
 
 /**
+ * =========================================================
  * Cookie helpers (browser only)
+ * =========================================================
  */
+
 function setCookie(name: string, value: string, days = 7): void {
   if (!isBrowser()) return;
   const maxAge = days * 24 * 60 * 60;
@@ -90,26 +112,91 @@ function clearCookie(name: string): void {
 }
 
 /**
- * Public API
+ * =========================================================
+ * Public Auth API
+ * =========================================================
+ */
+
+/**
+ * Login against API Gateway.
+ * Backend verifies credentials and issues JWT.
+ */
+export async function login(email: string, password: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error('Invalid email or password');
+  }
+
+  const data = await res.json();
+  if (!data?.access_token) {
+    throw new Error('Invalid login response');
+  }
+
+  setAccessToken(data.access_token);
+}
+
+/**
+ * Logout user (frontend only).
+ */
+
+
+export async function logout() {
+  try {
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8010"}/auth/logout`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+  } catch {
+    // ignore — even if network fails, treat as logged out
+  }
+
+  // Force navigation OUT of shell
+  window.location.href = "/login";
+}
+
+
+
+/**
+ * Store access token.
  */
 export function setAccessToken(token: string): void {
   setCookie(ACCESS_TOKEN_COOKIE, token, 7);
 }
 
+/**
+ * Retrieve raw JWT.
+ */
 export function getAccessToken(): string | null {
   return getCookie(ACCESS_TOKEN_COOKIE);
 }
 
+/**
+ * Remove JWT.
+ */
 export function clearAccessToken(): void {
   clearCookie(ACCESS_TOKEN_COOKIE);
 }
 
+/**
+ * Get decoded JWT claims (NO trust, informational only).
+ */
 export function getAuthClaims(): AuthClaims | null {
   const token = getAccessToken();
   if (!token) return null;
   return decodeJwt(token);
 }
 
+/**
+ * Authentication check used by UserShell.
+ */
 export function isAuthenticated(): boolean {
   const claims = getAuthClaims();
   if (!claims) return false;
@@ -117,22 +204,39 @@ export function isAuthenticated(): boolean {
 }
 
 /**
- * User dashboards do NOT enforce roles beyond "authenticated user"
- */
-export function requireUser(): void {
-  if (!isAuthenticated()) {
-    const err = new Error('User authentication required');
-    console.warn(err.message);
-    throw err;
-  }
-}
-
-/**
- * Attach Authorization header for API calls
+ * Attach Authorization header to API requests.
  */
 export function withAuthHeaders(init: RequestInit = {}): RequestInit {
   const token = getAccessToken();
   const headers = new Headers(init.headers || {});
   if (token) headers.set('Authorization', `Bearer ${token}`);
   return { ...init, headers };
+}
+
+
+
+
+export async function register(
+  email: string,
+  password: string
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      email: email.trim(),
+      password,
+      role: "user",
+    }),
+  });
+
+  if (!res.ok) {
+    let msg = `Registration failed (${res.status})`;
+    try {
+      const body = await res.json();
+      if (body?.detail) msg = body.detail;
+    } catch {}
+    throw new Error(msg);
+  }
 }

@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00d36829a0a4e41664792ff11774dc3cc08e261e2c": {
+      "workers": {
+        "app/agent-traces/[traceId]/page": {
+          "moduleId": "[project]/frontend/admin-dashboard/.next-internal/server/app/agent-traces/[traceId]/page/actions.js { ACTIONS_MODULE0 => \"[project]/frontend/admin-dashboard/app/agent-traces/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getAgentTraces",
+          "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts"
+        },
+        "app/agent-traces/page": {
+          "moduleId": "[project]/frontend/admin-dashboard/.next-internal/server/app/agent-traces/page/actions.js { ACTIONS_MODULE0 => \"[project]/frontend/admin-dashboard/app/agent-traces/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getAgentTraces",
+          "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts"
+        }
+      },
+      "layer": {
+        "app/agent-traces/[traceId]/page": "rsc",
+        "app/agent-traces/page": "rsc"
+      },
+      "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts",
+      "exportedName": "getAgentTraces"
+    },
+    "4031681afd29d3735a27b55073ca18a1dee911f5d1": {
+      "workers": {
+        "app/agent-traces/[traceId]/page": {
+          "moduleId": "[project]/frontend/admin-dashboard/.next-internal/server/app/agent-traces/[traceId]/page/actions.js { ACTIONS_MODULE0 => \"[project]/frontend/admin-dashboard/app/agent-traces/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getAgentTraceDetails",
+          "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts"
+        },
+        "app/agent-traces/page": {
+          "moduleId": "[project]/frontend/admin-dashboard/.next-internal/server/app/agent-traces/page/actions.js { ACTIONS_MODULE0 => \"[project]/frontend/admin-dashboard/app/agent-traces/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getAgentTraceDetails",
+          "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts"
+        }
+      },
+      "layer": {
+        "app/agent-traces/[traceId]/page": "rsc",
+        "app/agent-traces/page": "rsc"
+      },
+      "filename": "frontend/admin-dashboard/app/agent-traces/actions.ts",
+      "exportedName": "getAgentTraceDetails"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "j6owIuGh/5QMccZhaK1mJUZDYlS9gsEdIfH1quonNLc="
+}

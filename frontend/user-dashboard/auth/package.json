@@ -1,0 +1,8 @@
+
+{
+  "name": "@auth/auth",
+  "version": "0.1.0",
+  "main": "./auth.ts",
+  "types": "./auth.ts"
+}
+

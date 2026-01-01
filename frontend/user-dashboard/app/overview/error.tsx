@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Button from '../../../shared-ui/Button';
-
+// import Button from '@shared-ui/Button';
 interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;

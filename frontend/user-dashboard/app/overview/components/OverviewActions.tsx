@@ -1,6 +1,8 @@
 'use client';
 
 import Button from '../../../../shared-ui/Button';
+// ✅ Use alias (matches next.config.js)
+// import Button from '@shared-ui/Button';
 
 export default function OverviewActions() {
   return (

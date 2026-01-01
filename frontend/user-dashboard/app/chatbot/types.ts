@@ -1,65 +1,68 @@
 /**
- * Core chat message type
- *
- * Used across:
- * - UI
- * - actions.ts
- * - API responses
+ * =========================================================
+ * Chat roles
+ * =========================================================
  */
+
+export type ChatRole = 'user' | 'assistant' | 'system' | 'tool';
+
+/**
+ * =========================================================
+ * Core message types
+ * =========================================================
+ */
+
 export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system' | 'tool';
+  id?: string;
+  role: ChatRole;
   content: string;
-  timestamp: number;
-  metadata?: Record<string, unknown>;
+  timestamp?: number;
 }
 
 /**
- * Tool invocation information
- * (important for agent transparency & debugging)
+ * =========================================================
+ * Tool / agent metadata (future-ready)
+ * =========================================================
  */
-export interface ToolInvocation {
-  toolName: string;
-  input: Record<string, unknown>;
-  output?: Record<string, unknown>;
-  durationMs?: number;
-  success?: boolean;
+
+export interface ToolCall {
+  tool_name: string;
+  arguments?: Record<string, unknown>;
+  result?: unknown;
+}
+
+export interface AgentMetadata {
+  agent_name?: string;
+  reasoning?: string;
+  tool_calls?: ToolCall[];
 }
 
 /**
- * Agent reasoning step
- * (maps to LangGraph / LangChain internal steps)
+ * =========================================================
+ * Request / response contracts
+ * =========================================================
  */
-export interface AgentStep {
-  stepId: string;
-  type: 'reasoning' | 'tool' | 'decision';
-  description: string;
-  toolInvocation?: ToolInvocation;
-  timestamp: number;
+
+export interface ChatRequest {
+  conversation_id?: string;
+  message: string;
 }
 
-/**
- * Chat response from backend
- *
- * Backend may include:
- * - final answer
- * - tool usage
- * - agent trace id
- */
 export interface ChatResponse {
-  conversationId: string;
-  reply: string;
-  messages?: ChatMessage[];
-  agentSteps?: AgentStep[];
-  traceId?: string;
+  conversation_id: string;
+  messages: ChatMessage[];
+  agent?: AgentMetadata;
 }
 
 /**
- * User feedback on chatbot response
+ * =========================================================
+ * UI state helpers
+ * =========================================================
  */
-export interface ChatFeedback {
-  conversationId: string;
-  messageId: string;
-  rating: 'positive' | 'negative';
-  comment?: string;
+
+export interface ChatState {
+  conversationId?: string;
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error?: string;
 }

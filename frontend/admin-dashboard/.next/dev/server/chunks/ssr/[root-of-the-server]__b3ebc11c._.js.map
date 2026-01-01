@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///mnt/a29372f8-b47b-4a57-961a-4c0a75a3a75b/1_customercare/customer-support-ai-control-plane/frontend/admin-dashboard/app/page.tsx"],"sourcesContent":["import { redirect } from \"next/navigation\";\nimport { cookies } from \"next/headers\";\n\n/**\n * / → Redirect based on admin auth cookies\n */\nexport default async function AdminIndexRedirectPage() {\n  // ⬅️ cookies() is async in Next.js 16\n  const cookieStore = await cookies();\n\n  const access = cookieStore.get(\"csacp_admin_access_token\");\n  const refresh = cookieStore.get(\"csacp_admin_refresh_token\");\n\n  const isLoggedIn = Boolean(access?.value || refresh?.value);\n\n  if (isLoggedIn) {\n    redirect(\"/dashboard\");\n  }\n\n  redirect(\"/login\");\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;AACA;;;AAKe,eAAe;IAC5B,sCAAsC;IACtC,MAAM,cAAc,MAAM,IAAA,4KAAO;IAEjC,MAAM,SAAS,YAAY,GAAG,CAAC;IAC/B,MAAM,UAAU,YAAY,GAAG,CAAC;IAEhC,MAAM,aAAa,QAAQ,QAAQ,SAAS,SAAS;IAErD,IAAI,YAAY;QACd,IAAA,mOAAQ,EAAC;IACX;IAEA,IAAA,mOAAQ,EAAC;AACX"}}]
+}

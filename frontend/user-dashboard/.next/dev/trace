@@ -1,0 +1,1 @@
+[{"name":"hot-reloader","duration":67,"timestamp":2589087128,"id":3,"tags":{"version":"16.1.0"},"startTime":1767211810997,"traceId":"1a12cddad164a722"},{"name":"compile-path","duration":123409,"timestamp":2589148620,"id":4,"tags":{"trigger":"middleware"},"startTime":1767211811058,"traceId":"1a12cddad164a722"}]
